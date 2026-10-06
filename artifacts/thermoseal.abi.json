@@ -1,0 +1,205 @@
+{
+  "ctor": {
+    "params": [],
+    "kwparams": {}
+  },
+  "methods": {
+    "accept_shipment": {
+      "params": [
+        [
+          "sponsor_text",
+          "string"
+        ],
+        [
+          "shipment_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "cancel_unaccepted": {
+      "params": [
+        [
+          "shipment_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "get_info": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_shipment": {
+      "params": [
+        [
+          "sponsor_text",
+          "string"
+        ],
+        [
+          "shipment_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "open_shipment": {
+      "params": [
+        [
+          "shipment_id",
+          "string"
+        ],
+        [
+          "carrier_text",
+          "string"
+        ],
+        [
+          "brief",
+          "string"
+        ],
+        [
+          "manifest_url",
+          "string"
+        ],
+        [
+          "manifest_hash",
+          "string"
+        ],
+        [
+          "logger_host_text",
+          "string"
+        ],
+        [
+          "delivery_host_text",
+          "string"
+        ],
+        [
+          "min_temp_milli_c",
+          "int"
+        ],
+        [
+          "max_temp_milli_c",
+          "int"
+        ],
+        [
+          "max_excursion_seconds",
+          "int"
+        ],
+        [
+          "delivery_deadline",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": true
+    },
+    "review": {
+      "params": [
+        [
+          "sponsor_text",
+          "string"
+        ],
+        [
+          "shipment_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "settle": {
+      "params": [
+        [
+          "sponsor_text",
+          "string"
+        ],
+        [
+          "shipment_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "submit_evidence": {
+      "params": [
+        [
+          "sponsor_text",
+          "string"
+        ],
+        [
+          "shipment_id",
+          "string"
+        ],
+        [
+          "delivered_at",
+          "int"
+        ],
+        [
+          "temperature_log_url",
+          "string"
+        ],
+        [
+          "temperature_log_hash",
+          "string"
+        ],
+        [
+          "delivery_record_url",
+          "string"
+        ],
+        [
+          "delivery_record_hash",
+          "string"
+        ],
+        [
+          "image_url",
+          "string"
+        ],
+        [
+          "image_hash",
+          "string"
+        ],
+        [
+          "carrier_summary",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "timeout_refund": {
+      "params": [
+        [
+          "sponsor_text",
+          "string"
+        ],
+        [
+          "shipment_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    }
+  }
+}
