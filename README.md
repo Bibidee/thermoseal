@@ -72,7 +72,29 @@ The release gate explicitly lints the single source under `contracts/`; tests ar
 
 ## Deployment status
 
-The latest hardened source is **ThermoSeal v0.2.0** and requires a fresh deployment before it can be used or source-parity claims can be made. Its source SHA-256 is `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39` (39,330 bytes). Local verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed. Hosted GitHub Actions passed on source commit `dbbe65f47c0476d96fca127eb76cdee3dd19a8d3` in [run 37581980116](https://github.com/Bibidee/thermoseal/actions/runs/37581980116) and on the docs-evidence follow-up `7171c750e28d8ba1f04e06a069a752b91aa0247c` in [run 37582287013](https://github.com/Bibidee/thermoseal/actions/runs/37582287013). A v0.2.0 deployment has not been verified. The v0.1.0 deployment and its live transactions below are preserved as historical evidence only; they do not include image-host binding or the summary-prompt change.
+ThermoSeal **v0.2.0 is deployed and verified** on stable GenLayer Studionet (chain ID 61999) at [0xdc10379Ec4508b43A04eb6BFB6AeE479E99Bb10A](https://explorer-studio.genlayer.com/address/0xdc10379Ec4508b43A04eb6BFB6AeE479E99Bb10A). The deployment transaction [0x21a6d5d60d06f2823c09ef30266a85a167be1818ff2eb435499350e6227df61f](https://explorer-studio.genlayer.com/tx/0x21a6d5d60d06f2823c09ef30266a85a167be1818ff2eb435499350e6227df61f) finalized successfully with `MAJORITY_AGREE` and GenVM `SUCCESS`. `get_info()` returned `name=ThermoSeal`, `version=0.2.0`, and the expected v0.2.0 configuration.
+
+Deployed source was retrieved through `gen_getContractCode`, decoded, and compared byte-for-byte with `contracts/thermoseal.py`: both are 39,330 bytes with SHA-256 `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39`; parity is **YES**. Local verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed. Hosted GitHub Actions passed on source commit `dbbe65f47c0476d96fca127eb76cdee3dd19a8d3` in [run 37581980116](https://github.com/Bibidee/thermoseal/actions/runs/37581980116) and on follow-up commit `7171c750e28d8ba1f04e06a069a752b91aa0247c` in [run 37582287013](https://github.com/Bibidee/thermoseal/actions/runs/37582287013). The v0.1.0 deployment and live transactions below are preserved as historical evidence only; they do not include image-host binding or the summary-prompt change.
+
+## v0.2.0 live Studionet lifecycle
+
+Shipment `THERMO-V020-LIVE-20261007-01` used sponsor `0x794678ad7e8b6c87dab33303a3a512c821e6de9a`, designated carrier `0x2cd419603eba593074653930ddc4073d4fd8fc60`, and a `0.001 GEN` deposit (`1000000000000000` wei). Every transaction below is `FINALIZED`; the corresponding JSON-RPC transaction receipt has status `0x1`.
+
+| Stage | Transaction | Verified result |
+|---|---|---|
+| Open | [0x3501a2…944d99cb](https://explorer-studio.genlayer.com/tx/0x3501a2f7e63def7a87b277e92171c547586bbe561d160091218b5206944d99cb) | `awaiting_carrier`; committed manifest, host constraints, and deposit read back correctly. |
+| Carrier acceptance | [0xc8659a…7391eba](https://explorer-studio.genlayer.com/tx/0xc8659aba4b73560567e46ec70cca4fb1d34c3b25376ecfa163cb060b57391eba) | `in_transit`; designated carrier accepted. |
+| Evidence submission | [0x622040…321cf20](https://explorer-studio.genlayer.com/tx/0x622040e5fc8e6f81630e3f7285355a22cb9f1860f41d88de3d3d86be3321cf20) | `evidence_submitted`; committed URLs and hashes read back exactly. |
+| Semantic review | [0x70c4c9…2b9f82](https://explorer-studio.genlayer.com/tx/0x70c4e9433745b8d4d91824b8d8ef6fd4327d1a3d801ff20ea6cf074b4a2b9f82) | `approved`, confidence 85. Rationale: “All records share identical shipment ID; delivery timestamp precedes deadline; telemetry compliant with zero excursions.” |
+| Settlement | [0x699266…e7cb40](https://explorer-studio.genlayer.com/tx/0x69926606b0e16672a9ceaa43a6fef62cf7e79c81c18c0a936b1e00cfdde7cb40) | `payout_dispatched`; `deposited=0`, `dispatched_amount=1000000000000000`, and fixed carrier recipient. Carrier balance increased by 0.001 GEN. |
+
+The immutable live artifacts were fetched independently and their exact raw-byte hashes checked before submission:
+
+- Manifest: [raw artifact](https://raw.githubusercontent.com/Bibidee/thermoseal/a9358d53dda2b5809ca42bc6cd7c03fd2ce74bbd/evidence/live-v0.2.0/manifest.txt) — `0x4cf689232fdd52980017b128651fa2f4114b338216f86c7c3348bef511d7c37d`.
+- Temperature log: [raw artifact](https://raw.githubusercontent.com/Bibidee/thermoseal/7e2332828efa64c70fdea75d51b64c2856708e31/evidence/live-v0.2.0/temperature-log.json) — `0xfae2d2b1c46e472b04ae67d5075ab9dda62ed4f7fd1a3b8860592cf42106032e`.
+- Delivery record: [raw artifact](https://cdn.jsdelivr.net/gh/Bibidee/thermoseal@7e2332828efa64c70fdea75d51b64c2856708e31/evidence/live-v0.2.0/delivery-record.txt) — `0xee0db5b01bc13659ec538615399f130982e40e91b2b3856ef36fbcc65feaf9c9`.
+
+The canonical post-settlement read confirmed `payout_dispatched`, zero remaining deposit, the recorded dispatch amount, and the designated carrier. The recipient balance observation corroborates credit; the contract’s dispatch state alone is not treated as proof of transfer credit.
 
 ## Historical Studionet deployment: v0.1.0
 

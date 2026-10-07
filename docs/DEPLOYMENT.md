@@ -1,8 +1,41 @@
 # ThermoSeal release and deployment record
 
-## Release candidate status
+## Current release: v0.2.0
 
-The current hardened source is **v0.2.0**. It has not been deployed. Candidate source SHA-256 is `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39` (39,330 bytes). Local verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed. Hosted GitHub Actions passed on source commit `dbbe65f47c0476d96fca127eb76cdee3dd19a8d3` in [run 37581980116](https://github.com/Bibidee/thermoseal/actions/runs/37581980116) and on the docs-evidence follow-up `7171c750e28d8ba1f04e06a069a752b91aa0247c` in [run 37582287013](https://github.com/Bibidee/thermoseal/actions/runs/37582287013). The v0.1.0 address and transaction below are historical evidence only; their source parity and live lifecycle do not apply to v0.2.0. A fresh Studionet deployment and source retrieval/parity check are required before claiming v0.2.0 is live.
+ThermoSeal **v0.2.0 is deployed and verified** on stable **GenLayer Studionet, chain ID 61999**.
+
+- Contract: [`0xdc10379Ec4508b43A04eb6BFB6AeE479E99Bb10A`](https://explorer-studio.genlayer.com/address/0xdc10379Ec4508b43A04eb6BFB6AeE479E99Bb10A)
+- Deployment transaction: [`0x21a6d5d60d06f2823c09ef30266a85a167be1818ff2eb435499350e6227df61f`](https://explorer-studio.genlayer.com/tx/0x21a6d5d60d06f2823c09ef30266a85a167be1818ff2eb435499350e6227df61f)
+- Finalization: `FINALIZED`; transaction receipt status `0x1`; deployment CLI result `MAJORITY_AGREE` / GenVM `SUCCESS`.
+- `get_info()`: `name=ThermoSeal`, `version=0.2.0`, image evidence `optional_hash_bound_png_jpeg_webp_from_committed_delivery_host`, with the expected v0.2.0 limits and policy fields.
+- Local source: 39,330 bytes; SHA-256 `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39`.
+- Deployed source: retrieved with `gen_getContractCode`, decoded, and compared byte-for-byte; 39,330 bytes; same SHA-256; parity `YES`.
+- Local release verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed.
+- Hosted CI passed on source commit `dbbe65f47c0476d96fca127eb76cdee3dd19a8d3` ([run 37581980116](https://github.com/Bibidee/thermoseal/actions/runs/37581980116)) and follow-up `7171c750e28d8ba1f04e06a069a752b91aa0247c` ([run 37582287013](https://github.com/Bibidee/thermoseal/actions/runs/37582287013)).
+
+### v0.2.0 live shipment lifecycle
+
+Shipment `THERMO-V020-LIVE-20261007-01` used sponsor `0x794678ad7e8b6c87dab33303a3a512c821e6de9a`, designated carrier `0x2cd419603eba593074653930ddc4073d4fd8fc60`, and a deposit of `1000000000000000` wei (0.001 GEN). Each transaction is `FINALIZED` with JSON-RPC receipt status `0x1`.
+
+| Stage | Transaction | Result |
+|---|---|---|
+| Open | [`0x3501a2f7e63def7a87b277e92171c547586bbe561d160091218b5206944d99cb`](https://explorer-studio.genlayer.com/tx/0x3501a2f7e63def7a87b277e92171c547586bbe561d160091218b5206944d99cb) | Canonical read: `awaiting_carrier`; terms, manifest commitment, hosts and deposit match. |
+| Carrier acceptance | [`0xc8659aba4b73560567e46ec70cca4fb1d34c3b25376ecfa163cb060b57391eba`](https://explorer-studio.genlayer.com/tx/0xc8659aba4b73560567e46ec70cca4fb1d34c3b25376ecfa163cb060b57391eba) | Canonical read: `in_transit`; assigned carrier accepted. |
+| Evidence submission | [`0x622040e5fc8e6f81630e3f7285355a22cb9f1860f41d88de3d3d86be3321cf20`](https://explorer-studio.genlayer.com/tx/0x622040e5fc8e6f81630e3f7285355a22cb9f1860f41d88de3d3d86be3321cf20) | Canonical read: `evidence_submitted`; URLs/hashes match submitted values. |
+| Review | [`0x70c4e9433745b8d4d91824b8d8ef6fd4327d1a3d801ff20ea6cf074b4a2b9f82`](https://explorer-studio.genlayer.com/tx/0x70c4e9433745b8d4d91824b8d8ef6fd4327d1a3d801ff20ea6cf074b4a2b9f82) | Canonical read: `approved`, confidence 85; rationale: “All records share identical shipment ID; delivery timestamp precedes deadline; telemetry compliant with zero excursions.” |
+| Settlement | [`0x69926606b0e16672a9ceaa43a6fef62cf7e79c81c18c0a936b1e00cfdde7cb40`](https://explorer-studio.genlayer.com/tx/0x69926606b0e16672a9ceaa43a6fef62cf7e79c81c18c0a936b1e00cfdde7cb40) | Canonical read: `payout_dispatched`; deposited ledger zeroed; dispatched amount `1000000000000000` wei to the fixed carrier. Carrier balance increased by 0.001 GEN. |
+
+The immutable artifacts were fetched independently and raw-byte SHA-256 values matched before proposing:
+
+- Manifest: [`https://raw.githubusercontent.com/Bibidee/thermoseal/a9358d53dda2b5809ca42bc6cd7c03fd2ce74bbd/evidence/live-v0.2.0/manifest.txt`](https://raw.githubusercontent.com/Bibidee/thermoseal/a9358d53dda2b5809ca42bc6cd7c03fd2ce74bbd/evidence/live-v0.2.0/manifest.txt) — `0x4cf689232fdd52980017b128651fa2f4114b338216f86c7c3348bef511d7c37d`.
+- Temperature log: [`https://raw.githubusercontent.com/Bibidee/thermoseal/7e2332828efa64c70fdea75d51b64c2856708e31/evidence/live-v0.2.0/temperature-log.json`](https://raw.githubusercontent.com/Bibidee/thermoseal/7e2332828efa64c70fdea75d51b64c2856708e31/evidence/live-v0.2.0/temperature-log.json) — `0xfae2d2b1c46e472b04ae67d5075ab9dda62ed4f7fd1a3b8860592cf42106032e`.
+- Delivery record: [`https://cdn.jsdelivr.net/gh/Bibidee/thermoseal@7e2332828efa64c70fdea75d51b64c2856708e31/evidence/live-v0.2.0/delivery-record.txt`](https://cdn.jsdelivr.net/gh/Bibidee/thermoseal@7e2332828efa64c70fdea75d51b64c2856708e31/evidence/live-v0.2.0/delivery-record.txt) — `0xee0db5b01bc13659ec538615399f130982e40e91b2b3856ef36fbcc65feaf9c9`.
+
+The final canonical state was `payout_dispatched`, `deposited=0`, `dispatched_amount=1000000000000000`, and the designated carrier recipient. The carrier's observed balance rose from 449.0199 to 449.0209 GEN. This balance observation corroborates credit; dispatch status alone is not considered proof of transfer credit.
+
+## Historical release: v0.1.0
+
+The v0.1.0 address and transactions below are historical evidence only; their parity and lifecycle evidence do not apply to the current v0.2.0 deployment.
 
 ## Historical deployment: v0.1.0
 
