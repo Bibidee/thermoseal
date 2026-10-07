@@ -2,7 +2,7 @@
 
 ## Release candidate status
 
-The current hardened source is **v0.2.0**. It has not been deployed. Candidate source SHA-256 is `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39` (39,330 bytes). Local verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed. Hosted GitHub Actions passed on commit `dbbe65f47c0476d96fca127eb76cdee3dd19a8d3` in [run 37581980116](https://github.com/Bibidee/thermoseal/actions/runs/37581980116); a docs-only follow-up commit is being checked separately. The v0.1.0 address and transaction below are historical evidence only; their source parity and live lifecycle do not apply to v0.2.0. A fresh Studionet deployment and source retrieval/parity check are required before claiming v0.2.0 is live.
+The current hardened source is **v0.2.0**. It has not been deployed. Candidate source SHA-256 is `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39` (39,330 bytes). Local verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed. Hosted GitHub Actions passed on source commit `dbbe65f47c0476d96fca127eb76cdee3dd19a8d3` in [run 37581980116](https://github.com/Bibidee/thermoseal/actions/runs/37581980116) and on the docs-evidence follow-up `7171c750e28d8ba1f04e06a069a752b91aa0247c` in [run 37582287013](https://github.com/Bibidee/thermoseal/actions/runs/37582287013). The v0.1.0 address and transaction below are historical evidence only; their source parity and live lifecycle do not apply to v0.2.0. A fresh Studionet deployment and source retrieval/parity check are required before claiming v0.2.0 is live.
 
 ## Historical deployment: v0.1.0
 
