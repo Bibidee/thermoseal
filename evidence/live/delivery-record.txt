@@ -1,0 +1,5 @@
+ThermoSeal delivery record for shipment THERMO-LIVE-20261007061805.
+The assigned carrier delivered the sealed diagnostic reference material at Unix timestamp 1791350410.
+The delivery is for the manifest that requires continuous storage from 2.000 C through 8.000 C.
+The associated machine-readable telemetry log identifies the same shipment and reports 5.000 C at every recorded sample.
+The designated delivery recipient accepted the shipment record.
