@@ -2,15 +2,15 @@
 
 ## Purpose
 
-ThermoSeal is a reusable cold-chain evidence adjudication and escrow primitive. It combines deterministic temperature-log evaluation with validator consensus over the meaning and consistency of a committed manifest, delivery record, carrier summary, and optional image. It does not claim to certify physical truth or sensor identity.
+ThermoSeal is a reusable cold-chain evidence adjudication and escrow primitive. It combines deterministic temperature-log evaluation with validator consensus over the meaning and consistency of a committed manifest, delivery record, and optional image. The carrier summary is stored for audit display but is not authoritative evidence and is not included in the model prompt. ThermoSeal does not certify physical truth or sensor identity.
 
 ## Roles and commitments
 
 - **Sponsor:** opens a sponsor-scoped shipment record, deposits GEN, fixes the carrier, manifest hash, logger and delivery hostnames, temperature terms, deadline, and brief.
-- **Carrier:** accepts before `accept_by`, then submits a delivery timestamp, hash-bound telemetry and delivery record, optional hash-bound image, and a bounded summary.
+- **Carrier:** accepts before `accept_by`, then submits a delivery timestamp, hash-bound telemetry and delivery record, optional hash-bound image from the sponsor-committed delivery host, and a bounded informational summary.
 - **Any caller:** may trigger review, settle a finalized approved/blocked state, or trigger a matured timeout refund. The recipient is not caller-selected.
 
-Shipment IDs are scoped by sponsor address, so one sponsor cannot squat another sponsor's ID. Logger and delivery hostnames must be distinct and evidence URLs must match their sponsor-committed hostname. This is provenance input, not Sybil resistance or proof of domain ownership.
+Shipment IDs are scoped by sponsor address, so one sponsor cannot squat another sponsor's ID. Logger and delivery hostnames must be distinct; telemetry must match the committed logger host, and delivery record and optional image must match the committed delivery host. These hostname checks are admission filtering, not cryptographic publisher authentication, proof of DNS resolution, proof that redirects remain on-host, proof of domain ownership, or proof of organizational independence. SHA-256 proves exact byte identity only. DNS and redirects are handled by the GenLayer fetch layer. Integrators requiring strong provenance should use signed evidence or authenticated publisher identity.
 
 ## Deterministic temperature rule
 
@@ -35,12 +35,12 @@ Temperature records are caller-provided bytes. Their hash and parsed consistency
 
 For every review, both leader and validator:
 
-1. Fetch manifest, telemetry, delivery record, and the optional image independently over HTTPS.
+1. Fetch manifest, telemetry, delivery record, and optional image independently over HTTPS. Optional image admission requires its URL hostname to equal the sponsor-committed delivery hostname.
 2. Require a successful response, bounded non-empty raw bytes, and exact SHA-256 match before decoding or semantic use.
 3. Decode manifest/delivery as UTF-8; parse and deterministically evaluate the full telemetry JSON; validate the optional image as PNG, JPEG, or WebP.
 4. Only after integrity checks, call the LLM with the textual artifacts, deterministic telemetry result, and optional image bytes.
 
-Prompt inputs are embedded as untrusted JSON data. Instructions inside retrieved text or visible image text must not be followed. Hostname admission blocks obvious local names, IP literals, credentials, non-HTTPS schemes, non-default ports, fragments, and malformed authorities. The GenLayer fetch layer controls actual DNS and redirects; contract-level checks cannot prove that a hostname resolves publicly or remains on the same destination after redirect.
+The manifest, delivery text, URLs, telemetry metadata, and visible image text are framed as untrusted data. Instructions inside them must not be followed. Carrier summary is excluded from the prompt, so it cannot act as semantic evidence. Hostname admission blocks obvious local names, IP literals, credentials, non-HTTPS schemes, non-default ports, fragments, and malformed authorities. This is not DNS/redirect protection: the GenLayer fetch layer controls actual resolution and redirects, and the contract cannot prove that a hostname resolves publicly or stays on the same host after redirect. Prompt framing reduces instruction confusion but cannot guarantee that a model is immune to prompt injection; malformed or uncertain outputs fail closed.
 
 ## Semantic schema and equivalence
 
@@ -60,18 +60,19 @@ Validators agree on whether the result authorizes payment, not exact prose. Ever
 
 | Current state | Trigger | Next state | Escrow effect |
 |---|---|---|---|
-| `awaiting_carrier` | Assigned carrier accepts in time | `in_transit` | Held |
-| `awaiting_carrier` | Sponsor cancels or public acceptance timeout | `refund_dispatched` | Sponsor refund dispatched |
-| `in_transit` | Assigned carrier submits in-time evidence | `evidence_submitted` | Held |
-| `in_transit` | Public delivery timeout | `refund_dispatched` | Sponsor refund dispatched |
-| `evidence_submitted` / `retryable` | Valid safe review | `approved` | Held until settle |
-| `evidence_submitted` / `retryable` | Valid negative/uncertain result or permanent artifact/content defect | `blocked` | Held until settle |
-| `evidence_submitted` / `retryable` | Transient fetch/LLM failure or malformed model result | `retryable` | Held; retry cooldown and fixed review deadline |
+| `awaiting_carrier` | Assigned carrier accepts while `now < accept_by` | `in_transit` | Held |
+| `awaiting_carrier` | Sponsor cancels before acceptance deadline | `refund_dispatched` | Sponsor refund dispatched |
+| `awaiting_carrier` | Public acceptance timeout at `now >= accept_by` | `refund_dispatched` | Sponsor refund dispatched |
+| `in_transit` | Assigned carrier submits evidence while `now < delivery_by` and delivery time is valid | `evidence_submitted` | Held |
+| `in_transit` | Public delivery timeout at `now >= delivery_by` | `refund_dispatched` | Sponsor refund dispatched |
+| `evidence_submitted` / `retryable` | Valid safe review while `now < review_deadline` | `approved` | Held until settle |
+| `evidence_submitted` / `retryable` | Valid negative/uncertain result or permanent artifact/content defect before deadline | `blocked` | Held until settle |
+| `evidence_submitted` / `retryable` | Transient fetch/LLM failure or malformed model result before deadline | `retryable` | Held; retry cooldown and fixed review deadline |
 | `approved` | Permissionless settle | `payout_dispatched` | Carrier transfer dispatched |
 | `blocked` | Permissionless settle | `refund_dispatched` | Sponsor transfer dispatched |
-| `evidence_submitted` / `retryable` | Public review deadline timeout | `refund_dispatched` | Sponsor refund dispatched |
+| `evidence_submitted` / `retryable` | Public review timeout at `now >= review_deadline` | `refund_dispatched` | Sponsor refund dispatched |
 
-No cancellation is allowed after carrier acceptance. There is no owner or emergency role. State writes and ledger debits occur outside nondeterministic callbacks. All timeout paths are public and deterministic against transaction time.
+No cancellation is allowed after carrier acceptance. There is no owner or emergency role. State writes and ledger debits occur outside nondeterministic callbacks. At each deadline, the corresponding action is closed and its timeout refund is open at the same `now >= deadline` boundary, so review/acceptance/evidence submission and timeout paths do not overlap.
 
 ## Accounting and transfers
 
@@ -80,7 +81,7 @@ No cancellation is allowed after carrier acceptance. There is no owner or emerge
 ## Known limitations
 
 - No on-chain attestation that a sensor is genuine or that evidence represents a real shipment.
-- HTTPS/hostname checks do not prove DNS safety, redirect targets, publisher identity, or source independence.
+- HTTPS/hostname checks are admission filters; they do not prove DNS safety, redirect targets, publisher identity, domain ownership, organizational independence, or physical truth.
 - Optional visual interpretation depends on the network's configured vision-capable models; provider/model failures are retryable and never approve.
 - Consensus may be undetermined; retries and timeout refund provide a safe state path but do not guarantee finalization.
 - External transfer dispatch can fail independently after contract state commits; no authenticated in-contract reconciliation mechanism is assumed.

@@ -1,6 +1,6 @@
 /** Read one GenLayer contract method with JSON-typed arguments. */
-import { createClient } from "file:///C:/Users/ojiku/AppData/Roaming/npm/node_modules/genlayer/node_modules/genlayer-js/dist/index.js";
-import { studionet } from "file:///C:/Users/ojiku/AppData/Roaming/npm/node_modules/genlayer/node_modules/genlayer-js/dist/chains/index.js";
+import { createClient } from "genlayer-js";
+import { studionet } from "genlayer-js/chains";
 
 const contract = process.env.THERMO_CONTRACT;
 const method = process.env.THERMO_METHOD;

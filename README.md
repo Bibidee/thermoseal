@@ -1,6 +1,6 @@
 # ThermoSeal
 
-ThermoSeal is a standalone GenLayer Intelligent Contract primitive for cold-chain shipment escrow. A sponsor commits the shipment manifest, carrier, logger and delivery evidence hosts, temperature band, excursion allowance, and delivery deadline before funding. The carrier accepts the shipment and later commits a machine-readable temperature log, a delivery record, and optionally one image. Validators independently fetch and hash-check the exact artifacts; deterministic code evaluates the complete temperature log, while GenLayer consensus judges whether the committed records and optional image support the same shipment and delivery.
+ThermoSeal is a standalone GenLayer Intelligent Contract primitive for cold-chain shipment escrow. A sponsor commits the shipment manifest, carrier, logger and delivery evidence hosts, temperature band, excursion allowance, and delivery deadline before funding. The carrier accepts the shipment and later commits a machine-readable temperature log, a delivery record, and optionally one image from the sponsor-committed delivery host. Validators independently fetch and hash-check the exact artifacts; deterministic code evaluates the complete temperature log, while GenLayer consensus judges whether the committed records and optional image support the same shipment and delivery. The carrier summary is retained for audit display and excluded from the semantic review.
 
 ThermoSeal is a contract primitive, not a logistics frontend, sensor network, identity system, or guarantee that an uploaded record is true.
 
@@ -46,6 +46,7 @@ The carrier cannot alter terms after funding. Once evidence is submitted, the re
 - The contract hashes raw response bytes before decoding text. It rejects empty, oversized, mismatched, malformed, or invalidly encoded evidence from approval.
 - The temperature log is strict UTF-8 JSON with `shipment_id`, `sensor_id`, and ordered `{timestamp, temp_milli_c}` samples. The contract checks identity, bounds, sample count, transit timestamps, coverage gaps, and excursion allowance deterministically.
 - The semantic model receives the hash-verified manifest and delivery text, deterministic telemetry findings, and—if supplied—the hash-verified image bytes. Artifact text and visible image text are explicitly untrusted data, never reviewer instructions.
+- Optional image URLs must use the sponsor-committed `delivery_host`, just like the delivery record. The carrier summary remains available in shipment state but is not submitted as decision evidence.
 - Approval requires `shipment_match=yes`, `delivery_supported=yes`, `risk=no`, confidence at least 80, and deterministic telemetry compliance. Rationale is optional, bounded, and non-authoritative.
 - Each validator independently fetches and evaluates the evidence. Approval requires both independent analyses to derive the complete safe authorization tuple. Rationale is not consensus-critical. Differently reasoned rejections may agree because neither can authorize a carrier payout.
 
@@ -69,13 +70,17 @@ genvm-lint schema contracts/thermoseal.py --output artifacts/thermoseal.abi.json
 
 The release gate explicitly lints the single source under `contracts/`; tests are not treated as deployable sources. It checks the runtime-required version marker followed by the pinned `py-genlayer` dependency marker, runs the genuine `genlayer-test` Direct Mode fixtures, static and SDK validation, and compares generated ABI/schema output with the tracked artifact. The small Windows pytest plugin only defers the pinned test runner's temporary-file cleanup; it does not mock contract execution or GenLayer imports. Linux CI runs the official Direct Mode loader without that workaround.
 
-## Studionet deployment
+## Deployment status
+
+The latest hardened source is **ThermoSeal v0.2.0** and requires a fresh deployment before it can be used or source-parity claims can be made. Its source SHA-256 is `3d48fbdf74919a8a979558d066d29e1cc1cdc3774d39b7d0ea9cde0cf5558c39` (39,330 bytes). Local verification on 2026-10-07: 88 Direct Mode tests passed, zero skipped/failed; preflight, GenVM lint, and ABI/schema parity passed. Hosted CI for this revision and a v0.2.0 deployment have not yet been verified. The v0.1.0 deployment and its live transactions below are preserved as historical evidence only; they do not include image-host binding or the summary-prompt change.
+
+## Historical Studionet deployment: v0.1.0
 
 ThermoSeal v0.1.0 is deployed on stable GenLayer Studionet (chain ID 61999) at [0x4a9B92e516Dc7795F00e8eD5996287B9332Dc5b2](https://explorer-studio.genlayer.com/address/0x4a9B92e516Dc7795F00e8eD5996287B9332Dc5b2). The deployment transaction [0x57adc59b168839b0aaaacc4b332d28640d2f991e38dca34123a181e6198f2adb](https://explorer-studio.genlayer.com/tx/0x57adc59b168839b0aaaacc4b332d28640d2f991e38dca34123a181e6198f2adb) finalized with `MAJORITY_AGREE` and GenVM `SUCCESS`.
 
-The deployed source was retrieved with `gen_getContractCode` through GenLayerJS and compared byte-for-byte with `contracts/thermoseal.py`: both are 38,999 bytes and SHA-256 `52ad40cf50d77eaf840a1f3db4df2ad8c96ca82cec67d3da8ab070a79704ea88`. The live `get_info()` read reports `name=ThermoSeal`, `version=0.1.0`, and `min_escrow_wei=1000000000000000` (0.001 GEN), with the configured limits shown in the contract.
+At the time of the v0.1.0 release, deployed source was retrieved with `gen_getContractCode` through GenLayerJS and matched byte-for-byte: 38,999 bytes, SHA-256 `52ad40cf50d77eaf840a1f3db4df2ad8c96ca82cec67d3da8ab070a79704ea88`. The historical `get_info()` read reported `name=ThermoSeal`, `version=0.1.0`, and `min_escrow_wei=1000000000000000` (0.001 GEN). That parity applies only to the old v0.1.0 source.
 
-## Live lifecycle evidence
+## Historical v0.1.0 live lifecycle evidence
 
 Two finalized live cases now supplement the deployment evidence. Both used `thermo-sponsor` as the sponsor and `fresh-bob` as the assigned carrier; all writes finalized on Studionet with `MAJORITY_AGREE` and GenVM `SUCCESS`.
 
@@ -93,5 +98,11 @@ The committed live artifacts are [manifest](evidence/live/manifest-approved.txt)
 - Semantic consensus can disagree or remain undetermined. The contract fails closed; it does not promise an approved outcome or eliminate consensus uncertainty.
 - Escrow refunds and payouts are external transfer messages; dispatched accounting is not proof of recipient credit.
 - Historical shipment records remain in storage and carry chain costs.
+
+Hostname checks are admission filtering: they compare the hostname in each submitted URL to the committed host and reject obvious local or malformed targets. They do not authenticate a publisher, establish domain ownership or organizational independence, prove public DNS resolution, or guarantee that redirects remain on the checked host. SHA-256 proves only that fetched bytes equal the committed bytes. DNS and redirect handling are controlled by the GenLayer fetch layer. Integrators needing stronger provenance should use signed artifacts or an authenticated publisher identity.
+
+## Studionet helper scripts
+
+The typed read/write helpers use the pinned `genlayer-js` package in `package.json` and import its normal package entry points. Reads require `THERMO_CONTRACT`, `THERMO_METHOD`, and JSON-array `THERMO_ARGS_JSON`. Writes additionally require `THERMO_PRIVATE_KEY`, supplied through a secure process environment by the operator. The helper never prints or writes the key. Do not place credentials in source files, `.env` files tracked by Git, shell history, or command arguments. GenLayer CLI OS-keychain account unlocking is CLI-specific; the portable SDK helper accepts an in-memory signing key supplied by the caller.
 
 See [DESIGN.md](docs/DESIGN.md) for protocol rules and [DEPLOYMENT.md](docs/DEPLOYMENT.md) for the release/deployment checklist.

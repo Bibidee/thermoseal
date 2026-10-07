@@ -1,0 +1,16 @@
+{
+  "name": "thermoseal-studionet-tools",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "studionet:read": "node scripts/studionet_typed_read.mjs",
+    "studionet:write": "node scripts/studionet_typed_write.mjs"
+  },
+  "dependencies": {
+    "genlayer-js": "1.1.8"
+  }
+}
