@@ -68,11 +68,17 @@ with tempfile.TemporaryDirectory(prefix="thermoseal-schema-") as temp_dir:
     if generated.read_bytes() != tracked_abi.read_bytes():
         raise SystemExit("generated schema differs from tracked artifacts/thermoseal.abi.json")
 
+direct_test_env = os.environ.copy()
+# Keep Direct Mode on the same released runner used by lint and schema.  The
+# pinned test package otherwise falls back to an archived prerelease bundle
+# when its process environment is not propagated by a hosted runner.
+direct_test_env["GENVM_VERSION"] = GENVM_VERSION
 test = subprocess.run(
     [sys.executable, "-m", "pytest", "tests/direct", "-q"],
     cwd=ROOT,
     capture_output=True,
     text=True,
+    env=direct_test_env,
 )
 print(test.stdout, end="")
 print(test.stderr, end="", file=sys.stderr)
