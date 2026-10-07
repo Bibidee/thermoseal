@@ -1,0 +1,5 @@
+ThermoSeal delivery record for shipment THERMO-V020-LIVE-20261007-01.
+The assigned carrier delivered the sealed diagnostic reference material to Clinic-7 at 2026-10-07T07:12:52Z (Unix timestamp 1791357172).
+The shipment was handled under the committed 2.000 C through 8.000 C storage band.
+The associated machine-readable telemetry log identifies THERMO-V020-LIVE-20261007-01 and records 5.000 C throughout the covered transit interval.
+The designated delivery recipient accepted the shipment.
