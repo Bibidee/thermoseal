@@ -75,7 +75,7 @@ ThermoSeal v0.1.0 is deployed on stable GenLayer Studionet (chain ID 61999) at [
 
 The deployed source was retrieved with `gen_getContractCode` through GenLayerJS and compared byte-for-byte with `contracts/thermoseal.py`: both are 38,999 bytes and SHA-256 `52ad40cf50d77eaf840a1f3db4df2ad8c96ca82cec67d3da8ab070a79704ea88`. The live `get_info()` read reports `name=ThermoSeal`, `version=0.1.0`, and `min_escrow_wei=1000000000000000` (0.001 GEN), with the configured limits shown in the contract.
 
-**A shipment lifecycle has not yet been demonstrated on-chain.** No shipment was opened and no escrow funds were sent. At verification time, the installed CLI account list showed no account marked `(unlocked)`, so no authorized signer was available for the required sponsor/carrier writes. Do not treat deployment finality or source parity as lifecycle evidence.
+**A shipment lifecycle has not yet been demonstrated on-chain.** No shipment was opened and no escrow funds were sent. An unlocked sponsor signer is now available for the required writes, but deployment finality or source parity must not be treated as lifecycle evidence until finalized shipment transactions are recorded.
 
 ## Limits and trust assumptions
 

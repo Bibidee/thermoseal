@@ -14,7 +14,7 @@ ThermoSeal **v0.1.0 is deployed** on stable **GenLayer Studionet, chain ID 61999
 
 The first deployment attempt used an invalid contract header ordering and did not create a usable contract. It is superseded by the successful deployment above; the failed attempt was `0xc0b564e2ee13af5933bcf8e69aeaac85f1dd366ff390a5d060ad399a82db3365` and is not the current address.
 
-**Live shipment lifecycle: not yet run.** No proposal/open-shipment, carrier acceptance, evidence submission, semantic review, or settlement transaction is claimed. The local CLI account list currently shows no `(unlocked)` signer. Do not send a payable shipment transaction until a signer is available and the parties/evidence are verified.
+**Live shipment lifecycle: not yet run.** No proposal/open-shipment, carrier acceptance, evidence submission, semantic review, or settlement transaction is claimed. An unlocked sponsor signer is available; do not send a payable shipment transaction until the parties and hash-bound evidence are verified.
 
 ## Stable toolchain
 
