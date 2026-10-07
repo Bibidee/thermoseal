@@ -6,6 +6,7 @@ import pytest
 
 
 CONTRACT = "contracts/thermoseal.py"
+DIRECT_RUNNER_VERSION = "v0.2.16"
 NOW = "2026-10-01T12:00:00Z"
 NOW_TS = int(datetime(2026, 10, 1, 12, 0, tzinfo=timezone.utc).timestamp())
 ACCEPTED_AT = NOW_TS + 60
@@ -37,7 +38,9 @@ def address_text(address):
 
 def deploy(direct_vm, direct_deploy):
     direct_vm.warp(NOW)
-    return direct_deploy(CONTRACT)
+    # Pin the official runner used by this release.  This keeps Direct Mode
+    # independent of the test package's obsolete prerelease fallback.
+    return direct_deploy(CONTRACT, sdk_version=DIRECT_RUNNER_VERSION)
 
 
 def open_shipment(contract, direct_vm, sponsor, carrier, shipment_id="TS-001", amount=DEPOSIT,
