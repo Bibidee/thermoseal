@@ -1,0 +1,7 @@
+ThermoSeal live validation shipment THERMO-V020-LIVE-20261007-01.
+Sponsor: ThermoSeal validation sponsor.
+Assigned carrier: fresh-bob.
+Cargo: sealed diagnostic reference material for Clinic-7.
+Required temperature band: 2.000 C through 8.000 C inclusive.
+Maximum cumulative excursion: 0 seconds.
+The assigned carrier must provide a machine-readable temperature log and a delivery record for this exact shipment.
