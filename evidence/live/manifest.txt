@@ -1,0 +1,7 @@
+ThermoSeal live lifecycle shipment THERMO-LIVE-20261007-01.
+Sponsor: ThermoSeal validation sponsor.
+Carrier: assigned cold-chain carrier.
+Cargo: sealed diagnostic reference material.
+Required temperature band: 2.000 C through 8.000 C inclusive.
+Maximum cumulative excursion: 0 seconds.
+The designated carrier must provide a continuous machine-readable temperature log and a delivery record for this same shipment.
