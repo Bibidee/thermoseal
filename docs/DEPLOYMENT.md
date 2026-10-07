@@ -14,7 +14,33 @@ ThermoSeal **v0.1.0 is deployed** on stable **GenLayer Studionet, chain ID 61999
 
 The first deployment attempt used an invalid contract header ordering and did not create a usable contract. It is superseded by the successful deployment above; the failed attempt was `0xc0b564e2ee13af5933bcf8e69aeaac85f1dd366ff390a5d060ad399a82db3365` and is not the current address.
 
-**Live shipment lifecycle: not yet run.** No proposal/open-shipment, carrier acceptance, evidence submission, semantic review, or settlement transaction is claimed. An unlocked sponsor signer is available; do not send a payable shipment transaction until the parties and hash-bound evidence are verified.
+## v0.1.0 live lifecycle verification
+
+Live operations used the deployed source above without any contract modification or redeployment. The sponsor was `0x794678AD7e8B6c87dAb33303a3A512c821e6De9A`; the independent assigned carrier was `0x2cd419603eBa593074653930Ddc4073d4FD8fc60`.
+
+### Fail-closed path: identity contradiction and sponsor refund
+
+- Shipment ID: `THERMO-LIVE-20261007061805`
+- Open: [`0x287928b9a5a92e344742107f13a94ac93094bedf6e0b47abcd6883cd988e20b6`](https://explorer-studio.genlayer.com/tx/0x287928b9a5a92e344742107f13a94ac93094bedf6e0b47abcd6883cd988e20b6)
+- Carrier accept: [`0x914768b0ee3d06f77d52b3707264693bd6548c6fb0912191cde06ca048a67797`](https://explorer-studio.genlayer.com/tx/0x914768b0ee3d06f77d52b3707264693bd6548c6fb0912191cde06ca048a67797)
+- Evidence submit: [`0x8348bb4eed6e1a5991c7bfa9120ab790c5b76cd94636534fa14867fcc35e9daf`](https://explorer-studio.genlayer.com/tx/0x8348bb4eed6e1a5991c7bfa9120ab790c5b76cd94636534fa14867fcc35e9daf)
+- Review: [`0xfb3ce06be3db0f90c2da8f5cc1aa8f914b6013cf2f5544cc5a92f328659fb67e`](https://explorer-studio.genlayer.com/tx/0xfb3ce06be3db0f90c2da8f5cc1aa8f914b6013cf2f5544cc5a92f328659fb67e) finalized `MAJORITY_AGREE` / GenVM `SUCCESS` with canonical state `blocked`. The stored rationale identified the mismatched manifest shipment ID.
+- Settle: [`0x4b8461ac302ce21ae379a1c81cf16053a095d500e9f7c0c972c6808afeda5629`](https://explorer-studio.genlayer.com/tx/0x4b8461ac302ce21ae379a1c81cf16053a095d500e9f7c0c972c6808afeda5629) finalized `MAJORITY_AGREE` / GenVM `SUCCESS`, cleared the held ledger, and dispatched the 0.001 GEN sponsor refund.
+
+### Approved path: matching evidence and carrier payout
+
+- Shipment ID: `THERMO-LIVE-20261007-02`
+- Open: [`0x23f863da3820c6b3b2251e7c74e44777859e7d9386d9b0041595bcd9a1a3372d`](https://explorer-studio.genlayer.com/tx/0x23f863da3820c6b3b2251e7c74e44777859e7d9386d9b0041595bcd9a1a3372d)
+- Carrier accept: [`0xc8ae07dc7637bc5158556136b2532e43a8d365f6b9fac15c3a2f90f4bfb7605f`](https://explorer-studio.genlayer.com/tx/0xc8ae07dc7637bc5158556136b2532e43a8d365f6b9fac15c3a2f90f4bfb7605f)
+- Evidence submit: [`0x1428f3d7da97188772841950d53d1799239e38206c6734a2a43c7d5542c8ee5c`](https://explorer-studio.genlayer.com/tx/0x1428f3d7da97188772841950d53d1799239e38206c6734a2a43c7d5542c8ee5c)
+- Review: [`0xa3b8df68d726ad1198b1d078a20ea7f097ae56f9dcab3136d251cb00d4b5e8f0`](https://explorer-studio.genlayer.com/tx/0xa3b8df68d726ad1198b1d078a20ea7f097ae56f9dcab3136d251cb00d4b5e8f0) finalized `MAJORITY_AGREE` / GenVM `SUCCESS`. Canonical state became `approved` with confidence `100`; the stored rationale confirms matching shipment identity, a pre-deadline delivery timestamp, and 5.000 C telemetry inside the 2.000–8.000 C band.
+- Settle: [`0xe476e722138b70801ff006a1f959cdb5eb3dc569c1d8ae87a611c84664ff4abc`](https://explorer-studio.genlayer.com/tx/0xe476e722138b70801ff006a1f959cdb5eb3dc569c1d8ae87a611c84664ff4abc) finalized `MAJORITY_AGREE` / GenVM `SUCCESS`, transitioned state to `payout_dispatched`, set `deposited=0`, recorded `dispatched_amount=1000000000000000`, and emitted a 0.001 GEN message to the fixed carrier address. A post-settlement `account show` observed the carrier balance at 449.0199 GEN, up from the pre-lifecycle 449.0189 GEN.
+
+The immutable approved-path artifact hashes are:
+
+- Manifest: `0xcc90292a2c32e25e8d5486690ea73cce2ce3fe64e739dc896412e099ac2025bd`
+- Temperature log: `0x05cd0e83f585509a76214542b7c450ed2e4153622081262d190eea78e93c0104`
+- Delivery record: `0xfa8451c73bd194dcf648f966d366e737dd5571da03d74ded705abc8f4fcfba22`
 
 ## Stable toolchain
 
@@ -34,14 +60,4 @@ genvm-lint schema contracts/thermoseal.py --output artifacts/thermoseal.abi.json
 
 Preflight requires exactly one `contracts/*.py` source, parses/compiles the package, runs the complete Direct Mode suite, runs GenVM lint plus SDK validation, and compares generated schema output against the tracked ABI artifact. GitHub Actions runs this preflight on Python 3.12. `tests/conftest.py` is intentionally absent; the linter is invoked on the single deployable contract source, never on tests.
 
-## Remaining live lifecycle checklist
-
-1. Make an authorized sponsor and distinct carrier signer available on Studionet 61999; do not request or disclose private keys.
-2. Prepare immutable, independently retrievable manifest, temperature-log, and delivery-record artifacts. Verify exact raw-byte SHA-256 values before proposing.
-3. Open the shipment with the minimum supported escrow (0.001 GEN) only after verifying the sponsor, carrier, committed hostnames, temperature terms, and delivery deadline.
-4. Have the designated carrier accept, then submit hash-bound telemetry and delivery evidence.
-5. Run review and record its actual finalized consensus and canonical state. Do not force an approval; blocked/retryable results must follow the documented refund/retry paths.
-6. If approved or blocked, settle and inspect the transfer child receipt/credited value; `*_dispatched` alone is not proof of recipient credit. If retryable, record the timeout-refund path only after its deadline.
-7. Update this file and README only with observed finalized lifecycle evidence. Keep the successful deployment above as current unless a new source is deliberately deployed.
-
-No deployment or live evidence is claimed until those steps are completed.
+The deployment, parity proof, fail-closed refund path, approved payout path, and post-settlement carrier balance observation are now recorded above. The contract source remained frozen throughout the lifecycle work.
